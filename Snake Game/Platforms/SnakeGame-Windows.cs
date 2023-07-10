@@ -5,30 +5,30 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-namespace Snake_Game
+namespace Snake_Game.Platforms
 {
-    internal class SnakeGame
+    internal class SnakeGame_Windows
     {
         #region Window
 
-        private static RenderWindow? window;
-        private static VideoMode videoMode = new VideoMode(800, 600);
-        private static ContextSettings settings = new ContextSettings() { AntialiasingLevel = 1 };
+        private RenderWindow? window;
+        private VideoMode videoMode = new VideoMode(800, 600);
+        private ContextSettings settings = new ContextSettings() { AntialiasingLevel = 1 };
         private static Random random = new Random();
-        private static Clock deltaClock = new Clock();
-        private static DiscordRpcClient client;
-
+        private Clock deltaClock = new Clock();
+        private DiscordRpcClient client = new DiscordRpcClient("1127696837634166986");
         #endregion
 
         #region Game Variables
+
         private const float snakeSize = 20;
-        private static RectangleShape apple = new RectangleShape()
+        private RectangleShape apple = new RectangleShape()
         {
             Size = new Vector2f(20, 20),
             FillColor = Color.Red,
             Position = new Vector2f(-50, 0),
         };
-        private static RectangleShape massiveApple = new RectangleShape()
+        private RectangleShape massiveApple = new RectangleShape()
         {
             Size = new Vector2f(40, 40),
             FillColor = Color.Red,
@@ -46,30 +46,28 @@ namespace Snake_Game
         {
             public int bestScore = 0;
         }
-        private static SaveSystem saveSystem = new SaveSystem();
-        private static Direction snakeDirection = Direction.RIGHT;
-        private static Text scoreText = new Text();
-        private static Sound? hitSound, gameOverSound;
-        private static SoundBuffer? soundBuffer;
-        private static int score = 0;
-        private static int massiveAppleCounter = 0;
-        private static int massiveAppleHitter = random.Next(5, 15);
-        private static float snakeSpeed = 20f;
-        private static float massiveAppleVanishTime = 10.0f;
-        private static float massiveAppleAnimation = 0.5f;
-        private static bool isGameOver = true;
-        private static bool massiveAppleAppear = false;
-        private static bool addPiece = false;
-        private static List<RectangleShape> snake = new List<RectangleShape>();
+        private SaveSystem saveSystem = new SaveSystem();
+        private Direction snakeDirection = Direction.RIGHT;
+        private Text scoreText = new Text();
+        private Sound? hitSound, gameOverSound;
+        private SoundBuffer? soundBuffer;
+        private Timestamps? timestamps;
+        private int score = 0;
+        private int massiveAppleCounter = 0;
+        private int massiveAppleHitter = random.Next(5, 15);
+        private float snakeSpeed = 20f;
+        private float massiveAppleVanishTime = 10.0f;
+        private float massiveAppleAnimation = 0.5f;
+        private float snakeDelay = 0f;
+        private float updateDiscordStatus = 1.0f;
+        private bool isGameOver = true;
+        private bool massiveAppleAppear = false;
+        private bool addPiece = false;
+        private List<RectangleShape> snake = new List<RectangleShape>();
 
         #endregion
 
-        private static void Main(string[] args)
-        {
-            RunWindow();
-        }
-
-        private static void RunWindow()
+        public void RunWindow()
         {
             window = new RenderWindow(videoMode, "Snake Game - by J0nathan550!", Styles.Close, settings);
 
@@ -82,7 +80,7 @@ namespace Snake_Game
             Font font = new Font("Assets/Fixedsys.ttf");
             scoreText = new Text($"Score: {score}", font, 24)
             {
-                Position = new Vector2f((videoMode.Width / 2) - 60, (videoMode.Height / 2) - 300),
+                Position = new Vector2f(videoMode.Width / 2 - 60, videoMode.Height / 2 - 300),
                 FillColor = Color.Red
             };
 
@@ -104,7 +102,6 @@ namespace Snake_Game
 
             try
             {
-                client = new DiscordRpcClient("1127696837634166986");
                 client.Initialize();
                 client.SetPresence(new RichPresence()
                 {
@@ -115,9 +112,9 @@ namespace Snake_Game
                         LargeImageKey = "snake",
                         LargeImageText = "Snake Game!"
                     },
-                    Buttons = new Button[]
+                    Buttons = new DiscordRPC.Button[]
                     {
-                        new Button()
+                        new DiscordRPC.Button()
                         {
                             Label = "Play Snake Game!",
                             Url = "https://github.com/J0nathan550/Snake-Game"
@@ -154,10 +151,7 @@ namespace Snake_Game
             }
         }
 
-        private static float snakeDelay = 0f;
-        private static float updateDiscordStatus = 1.0f;
-        private static Timestamps timestamps;
-        private static void Update(float deltaTime)
+        private void Update(float deltaTime)
         {
             if (massiveAppleAppear)
             {
@@ -203,9 +197,9 @@ namespace Snake_Game
                                 LargeImageKey = "snake",
                                 LargeImageText = "Snake Game!"
                             },
-                            Buttons = new Button[]
+                            Buttons = new DiscordRPC.Button[]
                             {
-                        new Button()
+                        new DiscordRPC.Button()
                         {
                             Label = "Play Snake Game!",
                             Url = "https://github.com/J0nathan550/Snake-Game"
@@ -290,12 +284,12 @@ namespace Snake_Game
             }
         }
 
-        private static bool CollidesApple(RectangleShape other)
+        private bool CollidesApple(RectangleShape other)
         {
             return snake[0].GetGlobalBounds().Intersects(other.GetGlobalBounds());
         }
 
-        private static bool CollidesWithTail()
+        private bool CollidesWithTail()
         {
             for (int i = 0; i < snake.Count; i++)
             {
@@ -320,7 +314,7 @@ namespace Snake_Game
         //        || !windowBounds.Contains(snake.GetGlobalBounds().Left + snake.GetGlobalBounds().Width, snake.GetGlobalBounds().Top + snake.GetGlobalBounds().Height);
         //}
 
-        private static Vector2f MoveSnake()
+        private Vector2f MoveSnake()
         {
             //scoreText.DisplayedString = $"Position X: {snake[0].Position.X}\nPosition Y: {snake[0].Position.Y}";
             Vector2f lastPiece = snake[snake.Count - 1].Position;
@@ -364,7 +358,7 @@ namespace Snake_Game
             return lastPiece;
         }
 
-        private static void GameOver()
+        private void GameOver()
         {
             gameOverSound?.Play();
             snake.Clear();
@@ -402,9 +396,9 @@ namespace Snake_Game
                         LargeImageKey = "snake",
                         LargeImageText = "Snake Game!"
                     },
-                    Buttons = new Button[]
+                    Buttons = new DiscordRPC.Button[]
                     {
-                        new Button()
+                        new DiscordRPC.Button()
                         {
                             Label = "Play Snake Game!",
                             Url = "https://github.com/J0nathan550/Snake-Game"
@@ -418,7 +412,7 @@ namespace Snake_Game
             }
         }
 
-        private static void Welcome()
+        private void Welcome()
         {
             try
             {
@@ -431,13 +425,19 @@ namespace Snake_Game
                 file.Close();
                 string json = JsonConvert.SerializeObject(saveSystem, Formatting.Indented);
                 File.WriteAllText("save.json", json);
-                saveSystem.bestScore = 0;
+                if (saveSystem != null)
+                {
+                    saveSystem.bestScore = 0;
+                }
             }
-            scoreText.DisplayedString = $"Welcome to Snake Game!\nScore: {score}\nBest Score: {saveSystem.bestScore}\nPress 'R' to start game!";
-            snakeDirection = Direction.NONE;
+            if (saveSystem != null)
+            {
+                scoreText.DisplayedString = $"Welcome to Snake Game!\nScore: {score}\nBest Score: {saveSystem.bestScore}\nPress 'R' to start game!";
+                snakeDirection = Direction.NONE;
+            }
         }
 
-        private static void Window_KeyPressed(object? sender, KeyEventArgs e)
+        private void Window_KeyPressed(object? sender, KeyEventArgs e)
         {
             if (!isGameOver)
             {
@@ -486,7 +486,7 @@ namespace Snake_Game
             }
         }
 
-        private static void Window_Closed(object? sender, EventArgs e)
+        private void Window_Closed(object? sender, EventArgs e)
         {
             window?.Close();
         }

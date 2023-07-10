@@ -2,17 +2,26 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-android</TargetFramework>
     <RootNamespace>Snake_Game</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Assets\snake.ico</ApplicationIcon>
     <Company>J0nathan550</Company>
     <Authors>J0nathan550</Authors>
+    <StartupObject>Snake_Game.MainEntry</StartupObject>
+    <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+    <Version>$(VersionPrefix)</Version>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Assets\snake.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
